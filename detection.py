@@ -1,6 +1,7 @@
 import pygame
 import pygame.camera
 from pygame.locals import *
+import sys
 
 class Detection:
 	def __init__(self):
@@ -10,16 +11,15 @@ class Detection:
 		self.cam = ""
 		self.lightsWereOn = False
 		if camlist:
-			print "Camera found"
+			print "Camera found:", camlist[0]
 			self.cam = pygame.camera.Camera(camlist[0],(640,480))
+			self.cam.start()
 		else:
 			print "Camera not found, shutting down"
-			exit()
+			sys.exit()
 	
 	def lightsOn(self):
-		self.cam.start()
 		img = self.cam.get_image()
-		self.cam.stop()
 		color = pygame.transform.average_color(img)
 		if (color[0]+color[1]+color[2])/3 > 30:
 			return True
