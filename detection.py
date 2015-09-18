@@ -15,13 +15,17 @@ class Detection:
 			self.cam = pygame.camera.Camera(camlist[0],(640,480))
 			self.cam.start()
 		else:
-			print "Camera not found, shutting down"
-			sys.exit()
+			raise LookupError("Camera not found")
 	
 	def lightsOn(self):
 		img = self.cam.get_image()
 		color = pygame.transform.average_color(img)
-		if (color[0]+color[1]+color[2])/3 > 30:
+		threshold = (color[0]+color[1]+color[2])/3
+		if threshold > 30 and not self.lightsWereOn:
+			self.lightsWereOn = True
 			return True
-		else:
+		elif threshold < 30 and self.lightsWereOn:
+			self.lightsWereOn = False
 			return False
+		else:
+			return None
