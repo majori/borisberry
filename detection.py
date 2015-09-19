@@ -1,21 +1,25 @@
 import pygame
 import pygame.camera
 from pygame.locals import *
-import sys
+import dummy
+import sys, os
 
 class Detection:
 	def __init__(self):
+		self.lightsWereOn = False
 		pygame.init()
 		pygame.camera.init()
-		camlist = pygame.camera.list_cameras()
-		self.cam = ""
-		self.lightsWereOn = False
-		if camlist:
-			print "Camera found:", camlist[0]
-			self.cam = pygame.camera.Camera(camlist[0],(640,480))
-			self.cam.start()
+		if os.getenv('PYTHON_ENV', 'development') == 'production':
+			camlist = pygame.camera.list_cameras()
+			self.lightsWereOn = False
+			if camlist:
+				print "Camera found:", camlist[0]
+				self.cam = pygame.camera.Camera(camlist[0],(640,480))
+				self.cam.start()
+			else:
+				raise LookupError("Camera not found")
 		else:
-			raise LookupError("Camera not found")
+			self.cam = dummy.Camera()
 	
 	def lightsOn(self):
 		img = self.cam.get_image()
