@@ -1,7 +1,7 @@
-import tellcore.telldus
+import tellcore.telldus as td
 import tellcore.constants as const
 import tellcore.library as lib
-import detection
+from detection import Detection
 import dummy
 
 import time, sys, os
@@ -11,12 +11,15 @@ import time, sys, os
 def main():
 
 	# Initialize webcam and Tellstick
-	dt = detection.Detection()
+	dt = Detection()
 	if os.getenv('PYTHON_ENV', 'development') == 'production':
 		try:
-			core = tellcore.telldus.TelldusCore()
-			device = tellcore.telldus.Devices
-			tellcore.telldus.Device(1).turn_on()
+			core = td.TelldusCore()
+			
+			# Test all devices
+			for device in core.devices():
+				device.learn()
+				
 		except LookupError as e:
 			print "Error when looking up for camera: ",e
 			sys.exit()
@@ -25,9 +28,8 @@ def main():
 			sys.exit()
 	else:
 		core = dummy.TelldusCore()
-		device = dummy.Devices
 	
-	# Mainloop
+	# Main loop
 	while True:
 		try:
 			lights = dt.lightsOn()

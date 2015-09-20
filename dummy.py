@@ -1,7 +1,10 @@
+# This module allows program run even if there is no webcam
+# or Tellstick attached to computer.
+
 import pygame.camera
 import pygame.image
 import tellcore.telldus
-import random
+import time
 
 class TelldusCore(tellcore.telldus.TelldusCore):
 	def devices(self):
@@ -42,10 +45,14 @@ class Devices(tellcore.telldus.Device):
 class Camera(pygame.camera.Camera):
 	def __init__(self):
 		self.type = 'dummy'
-		
+	
+	# This function replaces pygame's image capture function.
+	# Instead of taking a image, switch between dark and
+	# white image every 10 second
 	def get_image(self):
-		dice = int(random.random()*2)
-		if dice == 0:
+		interval = 20
+		sec = int(time.strftime('%S')) % interval
+		if sec < interval/2:
 			return pygame.image.load("test_white.png")
 		else:
 			return pygame.image.load("test_black.png")
