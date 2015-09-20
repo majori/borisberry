@@ -21,11 +21,15 @@ class Detection:
 				raise LookupError("Camera not found")
 		else:
 			self.cam = dummy_Camera()
-	
+
+	# Check if lights are on or off
+	# Returns True if remotes can be turned on
+	# Returns False if remotes can be turned off
+	# Returns None if nothing should be done
 	def lightsOn(self):
 		threshold = 30
 		turnoffCountdown = 120
-		
+
 		img = self.cam.get_image()
 		color = pygame.transform.average_color(img)
 		avg_color = (color[0]+color[1]+color[2])/3

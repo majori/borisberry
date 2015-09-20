@@ -15,11 +15,11 @@ def main():
 	if os.getenv('PYTHON_ENV', 'development') == 'production':
 		try:
 			core = td.TelldusCore()
-			
+
 			# Test all devices
 			for device in core.devices():
 				device.learn()
-				
+
 		except LookupError as e:
 			print "Error when looking up for camera: ",e
 			sys.exit()
@@ -28,7 +28,7 @@ def main():
 			sys.exit()
 	else:
 		core = dummy.TelldusCore()
-	
+
 	# Main loop
 	while True:
 		try:
@@ -40,13 +40,13 @@ def main():
 				for device in core.devices():
 					device.turn_off()
 			time.sleep(1)
-					
+
 		# Catch errors
 		except KeyboardInterrupt:
 			print "Pressed Crtl+C!"
 			dt.cam.stop()
 			break
-			
+
 	sys.exit()
 
 main()
