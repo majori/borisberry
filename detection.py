@@ -10,7 +10,8 @@ class Detection:
 		self.lastSentCommand = False
 		pygame.init()
 		pygame.camera.init()
-		if os.getenv('PYTHON_ENV', 'development') == 'production':
+		
+		if os.getenv('BORISBERRY_ENV', 'production') == 'production':
 			camlist = pygame.camera.list_cameras()
 			self.turnoffTimestamp = False
 			if camlist:
@@ -27,12 +28,13 @@ class Detection:
 	# Returns False if remotes can be turned off
 	# Returns None if nothing should be done
 	def lightsOn(self):
-		threshold = 30
+		threshold = 45
 		turnoffCountdown = 120
 
 		img = self.cam.get_image()
 		color = pygame.transform.average_color(img)
 		avg_color = (color[0]+color[1]+color[2])/3
+
 		if avg_color > threshold and not self.lastSentCommand:
 			self.lastSentCommand = True
 			return True
@@ -40,9 +42,9 @@ class Detection:
 			if self.turnoffTimestamp == 0:
 				self.turnoffTimestamp = int(time.time())
 			if int(time.time()) - self.turnoffTimestamp > turnoffCountdown:
-					self.turnoffTimestamp = 0
-					self.lastSendCommand = False
-					return False
+				self.turnoffTimestamp = 0
+				self.lastSentCommand = False
+				return False
 			else:
 				return None
 		else:

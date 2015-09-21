@@ -54,6 +54,6 @@ class Camera(pygame.camera.Camera):
 		interval = 20
 		sec = int(time.strftime('%S')) % interval
 		if sec < interval/2:
-			return pygame.image.load("test_white.png")
+			return pygame.image.load(os.path.dirname(__file__) + "/test_white.png")
 		else:
-			return pygame.image.load("test_black.png")		
+			return pygame.image.load(os.path.dirname(__file__) + "/test_black.png")		
