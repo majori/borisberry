@@ -10,7 +10,7 @@ class Detection:
 		self.lastSentCommand = False
 		pygame.init()
 		pygame.camera.init()
-		
+
 		if os.getenv('BORISBERRY_ENV', 'production') == 'production':
 			camlist = pygame.camera.list_cameras()
 			self.turnoffTimestamp = False
@@ -29,7 +29,7 @@ class Detection:
 	# Returns None if nothing should be done
 	def lightsOn(self):
 		threshold = 45
-		turnoffCountdown = 120
+		turnoffCountdown = 60
 
 		img = self.cam.get_image()
 		color = pygame.transform.average_color(img)
