@@ -4,11 +4,19 @@
 import pygame.camera
 import pygame.image
 import tellcore.telldus
+import tellcore.library as lib
+import tellcore.constants as const
 import time
+import os
 
 class TelldusCore(tellcore.telldus.TelldusCore):
+
 	def devices(self):
-		return [Devices(1)]
+		devices = []
+		count = self.lib.tdGetNumberOfDevices()
+		for i in range(count):
+			devices.append(Devices(i+1))
+		return devices
 
 # Replaces functions which requires Tellstick connected
 class Devices(tellcore.telldus.Device):

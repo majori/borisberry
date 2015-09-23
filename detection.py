@@ -11,7 +11,7 @@ class Detection:
 		pygame.init()
 		pygame.camera.init()
 
-		if os.getenv('BORISBERRY_ENV', 'production') == 'production':
+		if os.getenv('BORISBERRY_ENV', 'development') == 'production':
 			camlist = pygame.camera.list_cameras()
 			self.turnoffTimestamp = False
 			if camlist:
@@ -22,7 +22,6 @@ class Detection:
 				raise LookupError("Camera not found")
 		else:
 			self.cam = dummy_Camera()
-
 	# Check if lights are on or off
 	# Returns True if remotes can be turned on
 	# Returns False if remotes can be turned off

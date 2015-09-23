@@ -27,7 +27,6 @@ class BorisberryDaemon(Daemon):
 		if os.getenv('BORISBERRY_ENV', 'production') == 'production':
 			try:
 				core = td.TelldusCore()
-				devices = getTellstickDevices(core)
 
 			except LookupError as e:
 				print "Error when looking up for camera: ",e
@@ -37,25 +36,33 @@ class BorisberryDaemon(Daemon):
 				sys.exit()
 		else:
 			core = dummy.TelldusCore()
-
+		
+		devices = getTellstickDevices(core)
 		signal.signal(signal.SIGTERM, signal_term_handler)
 		
 		# Main loop
 		while True:
 			lights = dt.lightsOn()
 			if lights is True:
-				print time.strftime('%a, %d %b %Y %H:%M:%S'), ': device "Soundsystem" turned on'
+				print "Turning 'Soundsystem' on"
 				devices['Soundsystem'].turn_on()
 			elif lights is False:
-				print time.strftime('%a, %d %b %Y %H:%M:%S'), ': device "Soundsystem" turned off'
+				print "Turning 'Soundsystem' off"
 				devices['Soundsystem'].turn_off()
 			time.sleep(1)
 
 # Daemon interface
 #
 if __name__ == "__main__":
-	daemon = BorisberryDaemon('/tmp/borisdaemon.pid')
+	pidfile = '/tmp/borisberry.pid'
+	own_terminal = '/dev/pts/2'
+	
 	if len(sys.argv) == 2:
+		if 'debug' == sys.argv[1]:
+			daemon = BorisberryDaemon(pidfile, stdout=own_terminal, stderr=own_terminal)
+			daemon.start()
+		else:
+			daemon = BorisberryDaemon(pidfile)
 		if 'start' == sys.argv[1]:
 			daemon.start()
 		elif 'stop' == sys.argv[1]:
