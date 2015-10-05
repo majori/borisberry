@@ -21,7 +21,10 @@ class Detection:
 			else:
 				raise LookupError("Camera not found")
 		else:
+			print 'Using dummy camera!'
 			self.cam = dummy_Camera()
+			
+			
 	# Check if lights are on or off
 	# Returns True if remotes can be turned on
 	# Returns False if remotes can be turned off

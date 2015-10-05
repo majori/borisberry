@@ -18,13 +18,11 @@ def getTellstickDevices(tdCore):
 		devices[device.name] = device
 	return devices
 
-class BorisberryDaemon(Daemon):
-
-	def run(self):
-		# Initialize webcam and Tellstick
+def process():
+	# Initialize webcam and Tellstick
 
 		dt = Detection()
-		if os.getenv('BORISBERRY_ENV', 'production') == 'production':
+		if os.getenv('BORISBERRY_ENV', 'development') == 'production':
 			try:
 				core = td.TelldusCore()
 
@@ -41,27 +39,37 @@ class BorisberryDaemon(Daemon):
 		signal.signal(signal.SIGTERM, signal_term_handler)
 		
 		# Main loop
-		while True:
-			lights = dt.lightsOn()
-			if lights is True:
-				print "Turning 'Soundsystem' on"
-				devices['Soundsystem'].turn_on()
-			elif lights is False:
-				print "Turning 'Soundsystem' off"
-				devices['Soundsystem'].turn_off()
-			time.sleep(1)
+		try:
+			while True:
+				lights = dt.lightsOn()
+				if lights is True:
+					print "Turning 'Soundsystem' on"
+					devices['Soundsystem'].turn_on()
+				elif lights is False:
+					print "Turning 'Soundsystem' off"
+					devices['Soundsystem'].turn_off()
+				time.sleep(1)
+		except SystemExit:
+			print 'SysExit'
+			sys.exit(0)
+		except KeyboardInterrupt:
+			sys.exit(0)
+
+class BorisberryDaemon(Daemon):
+
+	def run(self):
+		process()
 
 # Daemon interface
 #
 if __name__ == "__main__":
 	pidfile = '/tmp/borisberry.pid'
-	own_terminal = '/dev/pts/2'
 	
 	if len(sys.argv) == 2:
 		if 'debug' == sys.argv[1]:
-			daemon = BorisberryDaemon(pidfile, stdout=own_terminal, stderr=own_terminal)
-			daemon.start()
+			process()
 		else:
+			os.environ['BORISBERRY_ENV'] = 'production'
 			daemon = BorisberryDaemon(pidfile)
 		if 'start' == sys.argv[1]:
 			daemon.start()
@@ -74,5 +82,5 @@ if __name__ == "__main__":
 			sys.exit(2)
 		sys.exit(0)
 	else:
-		print "usage: %s start|stop|restart" % sys.argv[0]
+		print "usage: %s start|stop|restart|debug" % sys.argv[0]
 		sys.exit(2)
