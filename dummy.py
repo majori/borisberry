@@ -61,11 +61,11 @@ class Camera(pygame.camera.Camera):
 	def start(self):
 		# Do nothing
 		pass
-		
+
 	def stop(self):
 		# Do nothing
 		pass
-		
+
 	# This function replaces pygame's image capture function.
 	# Instead of taking a image, switch between dark and
 	# white image every 10 second
@@ -75,4 +75,4 @@ class Camera(pygame.camera.Camera):
 		if sec < interval/2:
 			return pygame.image.load(os.path.dirname(__file__) + "/test_white.png")
 		else:
-			return pygame.image.load(os.path.dirname(__file__) + "/test_black.png")		
+			return pygame.image.load(os.path.dirname(__file__) + "/test_black.png")

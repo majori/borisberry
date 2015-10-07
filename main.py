@@ -20,8 +20,9 @@ formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 h = NullHandler()
 logger.addHandler(h)
 
+# Catch SYSTERM
 def signal_term_handler(signal, frame):
-    sys.exit(0)
+	sys.exit(0)
 
 def getTellstickDevices(tdCore):
 	devices = {}
@@ -45,9 +46,9 @@ def process():
 				sys.exit()
 		else:
 			core = dummy.TelldusCore()
-		
+
 		devices = getTellstickDevices(core)
-		
+
 		# Main loop
 		try:
 			while True:
@@ -62,6 +63,7 @@ def process():
 		except KeyboardInterrupt:
 			sys.exit(0)
 
+# If daemon is used, define run()
 class BorisberryDaemon(Daemon):
 
 	def run(self):
@@ -80,18 +82,18 @@ if __name__ == "__main__":
 			ch.setFormatter(formatter)
 			logger.addHandler(ch)
 			logger.setLevel(logging.DEBUG)
-			
+
 			process()
 		else:
 			daemon = BorisberryDaemon('/tmp/borisberry.pid')
-			
+
 		if 'start' == sys.argv[1]:
 			# Setup logging to file
 			hdlr = RotatingFileHandler('/var/tmp/borisberry.log', maxBytes=5*1024*1024, backupCount=2)
 			hdlr.setFormatter(formatter)
 			logger.addHandler(hdlr)
 			logger.setLevel(logging.INFO)
-			
+
 			daemon.start()
 		elif 'stop' == sys.argv[1]:
 			daemon.stop()

@@ -25,10 +25,10 @@ class Detection:
 		else:
 			logger.info('Using dummy camera!')
 			self.cam = dummy_Camera()
-			
+
 	def __del__(self):
 		self.cam.stop()
-		
+
 	# Check if lights are on or off
 	# Returns True if remotes can be turned on
 	# Returns False if remotes can be turned off
@@ -41,7 +41,7 @@ class Detection:
 		color = pygame.transform.average_color(img)
 		avg_color = (color[0]+color[1]+color[2])/3
 		logger.debug('Camera color value: ' + str(avg_color))
-		
+
 		if avg_color > threshold and not self.lastStatus:
 			self.lastStatus = True
 			return True
