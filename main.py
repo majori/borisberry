@@ -7,7 +7,18 @@ from detection import Detection
 from daemon import Daemon
 import dummy
 
-import time, sys, os, signal
+import time, sys, atexit, os, signal, logging
+from logging.handlers import RotatingFileHandler
+
+# Setup logger
+class NullHandler(logging.Handler):
+	def emit(self,record):
+		pass
+
+logger = logging.getLogger('borisberry')
+formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+h = NullHandler()
+logger.addHandler(h)
 
 def signal_term_handler(signal, frame):
     sys.exit(0)
@@ -20,38 +31,34 @@ def getTellstickDevices(tdCore):
 
 def process():
 	# Initialize webcam and Tellstick
-
+		logger.info('------Process started!-------')
 		dt = Detection()
 		if os.getenv('BORISBERRY_ENV', 'development') == 'production':
 			try:
 				core = td.TelldusCore()
 
 			except LookupError as e:
-				print "Error when looking up for camera: ",e
+				logger.error('Error when looking up for camera: ' + e)
 				sys.exit()
 			except lib.TelldusError as e:
-				print "Error in Telldus: ", e
+				logger.error('Error in Telldus: ' + e)
 				sys.exit()
 		else:
 			core = dummy.TelldusCore()
 		
 		devices = getTellstickDevices(core)
-		signal.signal(signal.SIGTERM, signal_term_handler)
 		
 		# Main loop
 		try:
 			while True:
 				lights = dt.lightsOn()
 				if lights is True:
-					print "Turning 'Soundsystem' on"
+					logger.info('Turning "Soundsystem" on')
 					devices['Soundsystem'].turn_on()
 				elif lights is False:
-					print "Turning 'Soundsystem' off"
+					logger.info('Turning "Soundsystem" off')
 					devices['Soundsystem'].turn_off()
 				time.sleep(1)
-		except SystemExit:
-			print 'SysExit'
-			sys.exit(0)
 		except KeyboardInterrupt:
 			sys.exit(0)
 
@@ -62,16 +69,29 @@ class BorisberryDaemon(Daemon):
 
 # Daemon interface
 #
+signal.signal(signal.SIGTERM, signal_term_handler)
+
 if __name__ == "__main__":
-	pidfile = '/tmp/borisberry.pid'
-	
+
 	if len(sys.argv) == 2:
 		if 'debug' == sys.argv[1]:
+			# Setup logging to console
+			ch = logging.StreamHandler()
+			ch.setFormatter(formatter)
+			logger.addHandler(ch)
+			logger.setLevel(logging.DEBUG)
+			
 			process()
 		else:
-			os.environ['BORISBERRY_ENV'] = 'production'
-			daemon = BorisberryDaemon(pidfile)
+			daemon = BorisberryDaemon('/tmp/borisberry.pid')
+			
 		if 'start' == sys.argv[1]:
+			# Setup logging to file
+			hdlr = RotatingFileHandler('/var/tmp/borisberry.log', maxBytes=5*1024*1024, backupCount=2)
+			hdlr.setFormatter(formatter)
+			logger.addHandler(hdlr)
+			logger.setLevel(logging.INFO)
+			
 			daemon.start()
 		elif 'stop' == sys.argv[1]:
 			daemon.stop()

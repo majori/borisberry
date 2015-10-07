@@ -8,6 +8,9 @@ import tellcore.library as lib
 import tellcore.constants as const
 import time
 import os
+import logging
+
+logger = logging.getLogger('borisberry')
 
 class TelldusCore(tellcore.telldus.TelldusCore):
 
@@ -21,7 +24,7 @@ class TelldusCore(tellcore.telldus.TelldusCore):
 # Replaces functions which requires Tellstick connected
 class Devices(tellcore.telldus.Device):
 	def command_sent(self, command):
-		print 'DummyModule: sent', command, '-command to', self.name
+		logger.info('DummyModule: sent ' + command + ' -command to ' + self.name)
 
 	def bell(self):
 		self.command_sent('bell')
@@ -55,6 +58,14 @@ class Camera(pygame.camera.Camera):
 	def __init__(self):
 		self.type = 'dummy'
 
+	def start(self):
+		# Do nothing
+		pass
+		
+	def stop(self):
+		# Do nothing
+		pass
+		
 	# This function replaces pygame's image capture function.
 	# Instead of taking a image, switch between dark and
 	# white image every 10 second
