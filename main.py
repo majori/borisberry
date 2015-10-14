@@ -102,7 +102,6 @@ if __name__ == "__main__":
 		else:
 			print "Unknown command"
 			sys.exit(2)
-		sys.exit(0)
 	else:
 		print "usage: %s start|stop|restart|debug" % sys.argv[0]
 		sys.exit(2)

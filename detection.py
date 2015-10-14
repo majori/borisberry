@@ -2,6 +2,7 @@ import pygame
 import pygame.camera
 from pygame.locals import *
 from dummy import Camera as dummy_Camera
+from midi import Midi
 import time, sys, os, logging, atexit
 
 logger = logging.getLogger('borisberry')
@@ -10,6 +11,7 @@ class Detection:
 	def __init__(self):
 		self.turnoffTimestamp = 0
 		self.lastStatus = False
+		self.midiport = Midi()
 		pygame.init()
 		pygame.camera.init()
 
@@ -17,7 +19,7 @@ class Detection:
 			camlist = pygame.camera.list_cameras()
 			self.turnoffTimestamp = False
 			if camlist:
-				logger.debug('Camera found: ' + camlist[0])
+				logger.info('Using camera: ' + camlist[0])
 				self.cam = pygame.camera.Camera(camlist[0],(100,75))
 				self.cam.start()
 			else:
@@ -48,7 +50,15 @@ class Detection:
 		elif avg_color < threshold and self.lastStatus:
 			if self.turnoffTimestamp == 0:
 				self.turnoffTimestamp = int(time.time())
-			if int(time.time()) - self.turnoffTimestamp > turnoffCountdown:
+			delta = int(time.time()) - self.turnoffTimestamp
+			
+			# Send warning flickering via MIDI
+			interval = 2
+			if delta > turnoffCountdown*0.7:
+				interval = 0.2
+			self.midiport.flicker(interval)
+			
+			if delta > turnoffCountdown:
 				self.turnoffTimestamp = 0
 				self.lastStatus = False
 				return False
